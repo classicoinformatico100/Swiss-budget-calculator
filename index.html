@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Swiss Budget Calculator Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<div class="app-container">
+    <header class="main-header">
+        <div class="header-content">
+            <div class="brand">
+                <div class="swiss-flag-icon"></div>
+                <h1>Swiss <strong>Budget Calculator</strong></h1>
+            </div>
+            <div class="header-actions">
+                <button class="export-pdf-trigger" id="pdf-export">
+                    <i class="fas fa-file-pdf"></i> <span>Export PDF</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="responsive-wrapper">
+        <section class="mode-selection-area">
+            <div class="path-option active" id="path-monthly">
+                <div class="path-icon-container">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="path-label">
+                    <h3>Monthly Mode</h3>
+                    <p>Focus on daily budgeting</p>
+                </div>
+            </div>
+            <div class="path-option" id="path-yearly">
+                <div class="path-icon-container">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="path-label">
+                    <h3>Yearly Mode</h3>
+                    <p>Annual tax and wealth</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="dashboard-core-grid">
+            <section class="card config-section">
+                <div class="card-header">
+                    <i class="fas fa-sliders"></i>
+                    <h2>Base Configuration</h2>
+                </div>
+                <div class="input-form-group">
+                    <div class="field">
+                        <label>Target Canton</label>
+                        <select id="canton-selector">
+                            <option value="zurich">Zurich (ZH)</option>
+                            <option value="geneva">Geneva (GE)</option>
+                            <option value="bern">Bern (BE)</option>
+                            <option value="vaud">Vaud (VD)</option>
+                            <option value="valais">Valais (VS)</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label id="income-label">Monthly Gross Income (CHF)</label>
+                        <input type="number" id="gross-salary" placeholder="Enter amount...">
+                    </div>
+                    <div class="checkbox-row">
+                        <div class="custom-checkbox">
+                            <input type="checkbox" id="thirteenth-toggle">
+                            <label for="thirteenth-toggle">Include 13th Salary</label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card health-section">
+                <div class="card-header">
+                    <i class="fas fa-microchip"></i>
+                    <h2>Financial Health Score</h2>
+                </div>
+                <div class="health-display-flex">
+                    <div class="score-radial-container">
+                        <span id="health-score">0</span>
+                        <small>SCORE</small>
+                    </div>
+                    <div class="status-summary">
+                        <h4 id="status-label">Awaiting Input</h4>
+                        <p id="status-desc">Provide salary data to run intelligence scan.</p>
+                    </div>
+                </div>
+                <button class="btn-full-action" id="analyze-btn">RUN AI ANALYSIS</button>
+            </section>
+
+            <section class="card chart-section">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie"></i>
+                    <h2>Wealth Distribution</h2>
+                </div>
+                <div class="chart-layout-flex">
+                    <div class="chart-box">
+                        <canvas id="financialChart"></canvas>
+                    </div>
+                    <div id="numeric-summary" class="summary-pills-list">
+                        </div>
+                </div>
+            </section>
+
+            <section class="card expenses-detailed-section">
+                <div class="card-header">
+                    <i class="fas fa-receipt"></i>
+                    <h2>Detailed expense mapping per month</h2>
+                </div>
+                <div class="expenses-responsive-grid">
+                    <div class="deductions-column">
+                        <h3><i class="fas fa-university"></i> Statutory Deductions</h3>
+                        <div class="data-item"><span>AHV/IV/EO</span> <strong id="val-ahv">0 CHF</strong></div>
+                        <div class="data-item"><span>ALV Insurance</span> <strong id="val-alv">0 CHF</strong></div>
+                        <div class="data-item"><span>Pension Fund</span> <strong id="val-pension">0 CHF</strong></div>
+                        <div class="data-item highlight"><span>Withholding Tax</span> <strong id="val-tax">0 CHF</strong></div>
+                    </div>
+                    <div class="inputs-column">
+                        <h3><i class="fas fa-home"></i> Living & Lifestyle</h3>
+                        <div class="interactive-row"><span>Rent/Mortgage</span> <input type="number" id="exp-rent" value="0"></div>
+                        <div class="interactive-row"><span>Health (LAMal)</span> <input type="number" id="exp-health" value="0"></div>
+                        <div class="interactive-row"><span>Vehicle Tax/Reg.</span> <input type="number" id="exp-car-tax" value="0"></div>
+                        <div class="interactive-row"><span>Groceries</span> <input type="number" id="exp-food" value="0"></div>
+                        <div class="interactive-row"><span>Serafe (RTV)</span> <input type="number" id="exp-serafe" value="0"></div>
+                        <div class="interactive-row"><span>Mobile & Net</span> <input type="number" id="exp-net" value="0"></div>
+                        <div class="interactive-row"><span>Personal/Hobby</span> <input type="number" id="exp-hobby" value="0"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card vault-section full-span-widget">
+                <div class="vault-header-block">
+                    <div class="title-meta">
+                        <h3><i class="fas fa-vault"></i> The Secure Vault</h3>
+                        <p>Long-term wealth projection engine</p>
+                    </div>
+                    <div class="disposable-badge">
+                        <small>Monthly Surplus</small>
+                        <h2 id="disposable-val">0 CHF</h2>
+                    </div>
+                </div>
+                <div class="vault-controls-grid">
+                    <div class="savings-config-box">
+                        <div class="input-field-unit">
+                            <label>Savings Goal Target</label>
+                            <input type="number" id="goal-amount" value="50000">
+                        </div>
+                        <div class="input-field-unit">
+                            <label>Monthly Saving Contribution</label>
+                            <input type="range" id="vault-input" min="0" max="10000" value="1000">
+                            <div class="range-status"><span id="vault-current-val">1000</span> CHF</div>
+                        </div>
+                    </div>
+                    <div class="projections-display-box">
+                        <div class="progress-container-alt">
+                            <div class="progress-labels">
+                                <span>Goal Progress</span>
+                                <span id="progress-percent">0%</span>
+                            </div>
+                            <div class="bar-background">
+                                <div id="goal-fill" class="bar-foreground"></div>
+                            </div>
+                        </div>
+                        <div class="sp500-projection-grid">
+                            <div class="p-card"><span>1 YEAR (8%)</span><strong id="p-1">0</strong></div>
+                            <div class="p-card"><span>5 YEARS (8%)</span><strong id="p-5">0</strong></div>
+                            <div class="p-card"><span>10 YEARS (8%)</span><strong id="p-10">0</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <p>Swiss Budget Calculator Pro &copy; 2026 | All Rights Reserved</p>
+    </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
